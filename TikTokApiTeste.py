@@ -1,5 +1,5 @@
-from TikTokApi import TikTokApi 
-import pandas as pd 
+from TikTokApipasta.TikTokApi import tiktok
+#import pandas as pd 
 
 
 def main():
@@ -17,9 +17,6 @@ def main():
 
     print(len(trending))
 
-
-
-
-
 if __name__ == "__main__":
-    main()
+    #main()
+    print(tiktok.TikTokApi())
