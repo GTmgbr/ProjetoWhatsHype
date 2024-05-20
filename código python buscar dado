@@ -1,0 +1,116 @@
+!pip install Pytrends
+!pip install pandas
+!pip install gspread-dataframe==3.3.1
+
+SPREADSHEET = 'https://docs.google.com/spreadsheets/d/1GJOkStu-2VI-FZaBJs5z9E2sjbNt6PYtG27Nbg3gvuQ/edit'
+
+import pandas as pd
+from pytrends.request import TrendReq
+from google.colab import auth
+import gspread
+from google.auth import default
+import time
+import matplotlib.pyplot as plt
+import seaborn as sns
+from gspread_dataframe import get_as_dataframe, set_with_dataframe
+import urllib.parse
+import pathlib
+
+import contextlib
+
+import requests
+from pytrends.request import TrendReq
+
+class _TrendReq(TrendReq):
+    def GetGoogleCookie(self):
+        with _requests_get_as_post():
+            return super().GetGoogleCookie()
+
+
+@contextlib.contextmanager
+def _requests_get_as_post():
+    requests.get, requests_get = requests.post, requests.get
+    try:
+        yield
+    finally:
+        requests.get = requests_get
+
+auth.authenticate_user()
+creds, _ = default()
+gc = gspread.authorize(creds)
+startTime = time.time()
+pytrend = _TrendReq(hl='en-GB', tz=360)
+
+df = wb = gc.open_by_url(SPREADSHEET)
+sheet = wb.worksheet("Criteria")
+df2 = sheet.col_values(5)
+d_from = sheet.acell('B7').value
+d_to = sheet.acell('B8').value
+
+
+dataset_time = []
+DELAY_TIME = 2
+df_list = []
+keywords = []
+
+
+geos = list(sheet.col_values(7))
+
+
+for geo1 in geos:
+  keywords = list(df2)
+  
+  pytrend.build_payload(kw_list=keywords, cat=0, timeframe= str(d_from + " " + d_to), geo= str(geo1))
+  done = False
+  while not done:
+    try:
+      data_time = pytrend.interest_over_time()
+      done = True
+      break
+    except:
+      time.sleep(DELAY_TIME)
+      
+  data_time['country']=geo1
+  data_time = data_time.drop(labels=['isPartial'],axis='columns')
+  dataset_time.append(data_time)
+
+
+  datalist = []
+  for i in dataset_time:
+    result = pd.DataFrame(i)
+    datalist.append(result)
+
+  for i in datalist:
+    df_list.append(i)
+
+new_df_list = []
+
+for i in df_list:
+  new_i = i.dropna(axis=1, how='all')
+  new_df_list.append(new_i)
+
+final_df_list = None
+for i in new_df_list:
+  if final_df_list is None:
+    final_df_list = [i]
+  else:
+    hasdf = False
+    for j in final_df_list:
+      if i.equals(j):
+        hasdf = True
+    if not hasdf:
+      final_df_list.append(i)
+
+new_final = []
+for i in final_df_list:
+  new_i = i.reset_index().set_index(['date'])
+  new_final.append(new_i)
+
+big_df = pd.concat(new_final).reset_index()
+big_df['date'] = pd.to_datetime(big_df['date']).dt.date
+
+big_df = big_df.set_index(['date'])
+
+wsResults = wb.worksheet("Results")
+wsResults.clear()
+set_with_dataframe(wsResults, big_df, include_index=True)
