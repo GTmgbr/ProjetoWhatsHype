@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Google API, pyTrends, Relative Search Volume + Trending KW Data
-@author: AdamGetbags
-"""
-
 # import modules
 import requests
 import pandas as pd
