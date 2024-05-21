@@ -6,8 +6,10 @@ it = client.p.front.pull.hot(37)
 l = list(it)
 for subm in l:
     print("r/{0.subreddit.name} | {0.id36}+ ^{0.score} | {0.title!r:.80}".format(subm))
+    print(dir(subm))
 
-#
+#['apply_removal_reason', 'approve', 'archived', 'author', 'author_display_name', 'b', 'client', 'comment_count', 'created_at', 'created_ut', 'd', 'delete', 'distinguish', 'distinguished', 'edited', 'edited_at', 'edited_ut', 'event', 'flair', 'id', 'id36', 'idn', 'in_contest_mode', 'is_crosspostable', 'is_edited', 'is_poster_profile_pinned', 'is_robot_indexable', 'link', 'lock', 'locked', 'me', 'mod', 'nsfw', 'num_crossposts', 'oc', 'permalink', 'permalink_path', 'removal_category', 'remove', 'reply', 'reports', 'score', 'score_hidden', 'send_removal_comment', 'send_removal_message', 'spoiler', 'stickied', 'sticky', 'subreddit', 'suggested_sort', 'title', 'undistinguish', 'unlock', 'unsticky', 'upvote_ratio']
+
 # # How many subscribers does r/Python have?
 # subr = client.p.subreddit.fetch_by_name('Python')
 # print(subr.subscriber_count)
@@ -29,5 +31,3 @@ print(f'''\
 u/{c.author_display_name} says:
 {c.body}
 ''')
-
-

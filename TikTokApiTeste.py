@@ -4,7 +4,7 @@ from TikTokApipasta.TikTokApi import tiktok
 
 def main():
 
-    api = TikTokApi()
+    api = tiktok.TikTokApi()
 
     results = 10
 
@@ -18,5 +18,5 @@ def main():
     print(len(trending))
 
 if __name__ == "__main__":
-    #main()
     print(tiktok.TikTokApi())
+    main()
